@@ -11,7 +11,7 @@ def population_to_texture(width: int, height: int, population: List[Individual])
     for member in population:
         x, y = member.x, member.y
 
-        pixel = texture[x, y]
+        pixel = texture[y, x]
         pixel[0] = member.c1
         pixel[1] = member.c2
         pixel[2] = member.c3

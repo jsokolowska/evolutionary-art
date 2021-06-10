@@ -14,16 +14,16 @@ class SimpleFitness(fitness_functions.FitnessFunction):
     def __init__(self, color):
         self.color = color
 
-    def __call__(self, individual):
-        r_diff = abs(individual.c1 - self.color[0])
-        g_diff = abs(individual.c2 - self.color[1])
-        b_diff = abs(individual.c3 - self.color[2])
+    def __call__(self, color, x, y):
+        r_diff = abs(color[0] - self.color[0])
+        g_diff = abs(color[1] - self.color[1])
+        b_diff = abs(color[2] - self.color[2])
 
         return r_diff + g_diff + b_diff
 
 
 class Temp(fitness_functions.FitnessFunction):
-    def __call__(self, individual):
+    def __call__(self, color, x, y):
         return 0
 
 
@@ -33,20 +33,20 @@ class AestheticFitness(fitness_functions.FitnessFunction):
         self.p = p
         self.channel = channel
 
-    def __call__(self, individual):
+    def __call__(self, color, x, y):
         if self.channel == "c1":
-            return abs(individual.c1 - self.aesthetic(individual.x, individual.y, self.p))
+            return abs(color[0] - self.aesthetic(x, y, self.p))
         elif self.channel == "c2":
-            return abs(individual.c2 - self.aesthetic(individual.x, individual.y, self.p))
+            return abs(color[1] - self.aesthetic(x, y, self.p))
         elif self.channel == "c3":
-            return abs(individual.c3 - self.aesthetic(individual.x, individual.y, self.p))
+            return abs(color[2] - self.aesthetic(x, y, self.p))
         else:
             raise RuntimeError("Invalid channel")
 
 
 if __name__ == "__main__":
 
-    width, height = 256, 256
+    width, height = 50, 50
     iterations = 150
     step = 30
     generation = 0
@@ -64,13 +64,13 @@ if __name__ == "__main__":
 
     selection = selections.BestFit()
     mutation = mutations.GaussianMutation(0, 10)
-    # fitness = SimpleFitness((255, 0, 0))
+    # fitness = SimpleFitness((255, 0, 255))
     fitness = fitness_functions.CompoundFitnessFunction(aesthetic_fitness_list)
-    initial_population = population.generate_initial_population(width, height, (255, 255, 255))
+    initial_population = population.generate_initial_population(width, height, [255, 255, 255, 0])
     print("Generated new population of {} individuals".format(width * height))
 
     # alg = algorithm.BasicEvolution(initial_population, mutation, selection)
-    alg = algorithm.PSO(initial_population, 2, 2, 0.9, 0.4, iterations, width, height)
+    alg = algorithm.PSO(initial_population, 2, 2, 0.4, 0.9, iterations, width, height)
 
     while iterations > 0:
         img = visualization.image_from_population(width, height, alg.population)

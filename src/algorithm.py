@@ -28,18 +28,19 @@ class PSO(Algorithm):
         Instead of global neighbourhood Neumann topography is used
     """
 
-    def __init__(self, population: List[List[int]], c1: float, c2: float, inertia_min: float, inertia_max: float, iterations: int, width: int, height: int):
+    def __init__(self, population: List[List[int]], c1: float, c2: float, r, inertia_min: float, inertia_max: float, iterations: int, width: int, height: int):
         self.population = np.array(population)
 
         self.location = self.population
         self.best_location = copy.deepcopy(self.location)
         self.next_location = copy.deepcopy(self.location)
-        self.velocity = np.array([(np.random.uniform(-1, 1), np.random.uniform(-1, 1), np.random.uniform(-1, 1)) for i in population])
+        self.velocity = np.array([(np.random.uniform(-255, 255), np.random.uniform(-255, 255), np.random.uniform(-255, 255)) for i in population])
         self.score = np.zeros(len(population))
         self.best_score = np.full(len(population), math.inf)
 
         self.c1 = c1
         self.c2 = c2
+        self.range = r
 
         self.random_seed = np.random.uniform(0, 1)
         self.inertia_min = inertia_min
@@ -67,7 +68,7 @@ class PSO(Algorithm):
         random2 = self.c2 * np.random.uniform(0, 1, self.location.shape)
 
         best_self_velocity = random1 * (self.best_location - self.location)
-        best_neighbour_velocity = random2 * (self.best_neighbours() - self.location)
+        best_neighbour_velocity = random2 * (self.best_neighbours(self.range) - self.location)
 
         self.velocity = inertia * self.velocity + best_self_velocity + best_neighbour_velocity
         self.velocity = np.clip(self.velocity, -255, 255)
@@ -98,37 +99,48 @@ class PSO(Algorithm):
                 x = 0
                 y += 1
 
-    def best_neighbour(self, x, y):
+    def best_neighbour(self, x, y, r):
         best_index = -1
         best_score = math.inf
 
+        # for i in range(-r, r):
+        #     for j in range(-r, r):
+        #         if i == 0 and j == 0:
+        #             continue
+        #
+        #         if 0 <= x + i < self.width and 0 <= y + j < self.height:
+        #             index = self.width * (y + j) + x + i
+        #             if self.best_score[index] < best_score:
+        #                 best_score = self.best_score[index]
+        #                 best_index = index
+
         index = self.width * y + x - 1
-        if 0 <= index < self.width * self.height and self.score[index] < best_score:
-            best_score = self.score[index]
+        if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
+            best_score = self.best_score[index]
             best_index = index
 
         index = self.width * y + x + 1
-        if 0 <= index < self.width * self.height and self.score[index] < best_score:
-            best_score = self.score[index]
+        if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
+            best_score = self.best_score[index]
             best_index = index
 
         index = self.width * (y - 1) + x
-        if 0 <= index < self.width * self.height and self.score[index] < best_score:
-            best_score = self.score[index]
+        if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
+            best_score = self.best_score[index]
             best_index = index
 
         index = self.width * (y + 1) + x
-        if 0 <= index < self.width * self.height and self.score[index] < best_score:
+        if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
             best_index = index
 
-        return self.location[best_index]
+        return self.best_location[best_index]
 
-    def best_neighbours(self):
+    def best_neighbours(self, r):
         x, y = 0, 0
         best_neighbours = copy.deepcopy(self.location)
 
         for i, location in enumerate(self.location, 0):
-            best_neighbours[i] = self.best_neighbour(x, y)
+            best_neighbours[i] = self.best_neighbour(x, y, r)
 
             x += 1
             if x >= self.width:

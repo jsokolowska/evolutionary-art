@@ -49,3 +49,5 @@ def random_aesthetic():
     index = np.random.randint(0, len(aesthetic_functions))
 
     return aesthetic_functions[index], index + 1
+
+

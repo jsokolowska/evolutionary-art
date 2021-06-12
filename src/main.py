@@ -6,6 +6,9 @@ import mutations
 import selections
 import fitness_functions
 from aesthetic_functions import *
+from tqdm import trange
+from PIL import Image
+from numpy import asarray
 
 import visualization
 
@@ -44,6 +47,25 @@ class AestheticFitness(fitness_functions.FitnessFunction):
             raise RuntimeError("Invalid channel")
 
 
+class ImitationAesthetic(fitness_functions.FitnessFunction):
+    def __init__(self, artwork_path, channels=None):
+        if channels is None:
+            channels = ["c1", "c2", "c3"]
+        artwork = Image.open(artwork_path)
+        self.data = asarray(artwork)
+        self.channels = channels
+
+    def __call__(self, color, x, y):
+        score = 0
+        if "c1" in self.channels:
+            score += abs(color[0] - self.data[y][x][0])
+        if "c2" in self.channels:
+            score += abs(color[1] - self.data[y][x][1])
+        if "c3" in self.channels:
+            score += abs(color[2] - self.data[y][x][2])
+        return score
+
+
 if __name__ == "__main__":
 
     width, height = 150, 150
@@ -65,14 +87,15 @@ if __name__ == "__main__":
     selection = selections.BestFit()
     mutation = mutations.GaussianMutation(0, 10)
     # fitness = SimpleFitness((255, 0, 255))
-    fitness = fitness_functions.CompoundFitnessFunction(aesthetic_fitness_list)
+    fitness = fitness_functions.CompoundFitnessFunction(aesthetic_fitness_list, weights)
+    # fitness = ImitationAesthetic("../target/drawisland.png")
     initial_population = population.generate_initial_population(width, height, [255, 255, 255, 0])
     print("Generated new population of {} individuals".format(width * height))
 
     # alg = algorithm.BasicEvolution(initial_population, mutation, selection)
     alg = algorithm.PSO(initial_population, 2, 2, 0.4, 0.9, iterations, width, height)
 
-    while iterations > 0:
+    for i in trange(0, iterations, step):
         img = visualization.image_from_population(width, height, alg.population)
         img.save("../results/generation_{}.png".format(generation))
 
@@ -84,6 +107,8 @@ if __name__ == "__main__":
         generation += step
 
         iterations -= step
+        if iterations <= 0:
+            break
 
     img = visualization.image_from_population(width, height, alg.population)
     img.save("../results/generation_{}.png".format(generation))

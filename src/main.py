@@ -12,9 +12,9 @@ import visualization
 
 if __name__ == "__main__":
 
-    width, height = 400, 400
+    width, height = 200, 200
     iterations = 150
-    step = 30
+    step = 10
     generation = 0
     show_images = False
     p = 1
@@ -24,23 +24,18 @@ if __name__ == "__main__":
     fitness3, index3 = random_aesthetic()
     print("Aesthetic functions chosen: c1-{}, c2-{}, c3-{}".format(index1, index2, index3))
 
-    aesthetic_fitness_list = [AestheticFitness(fitness1, width, height, p, "c1"),
-                              AestheticFitness(fitness2, width, height, p, "c2"),
-                              AestheticFitness(fitness3, width, height, p, "c3"),
-                              ImitationAesthetic("../target/starry_night.jpg")]
-
     # weights = [1/6, 1/6, 1/6, 1]
-    weights = [0.6, 0.6, 0.6, 1]
+    # weights = [0.6, 0.6, 0.6, 1]
+    weights = [1, 1, 1, 0]
     # weights = [0, 0, 0, 1]
-    imitation = np.asarray(Image.open("../target/scream.jpg").convert("RGB")).reshape((width * height, 3))
+    # imitation = np.asarray(Image.open("../target/scream.jpg").convert("RGB")).reshape((width * height, 3))
 
     # fitness = SimpleFitness((255, 0, 255))
-    fitness = ImageFitnessFunction(width, height, fitness1, fitness2, fitness3, p, imitation.data, weights)
+    # fitness = ImageFitnessFunction(width, height, fitness1, fitness2, fitness3, p, imitation.data, weights)
+    fitness = ImageFitnessFunction(width, height, fitness1, fitness2, fitness3, p, None, weights)
     fitness_target = visualization.image_from_population(width, height, fitness.texture)
     fitness_target.save("../results/fitness_target.png")
 
-    # fitness = CompoundFitnessFunction(aesthetic_fitness_list, weights)
-    # fitness = CompoundFitnessFunction([SimpleFitness((255, 0, 0)), SimpleFitness((0, 0, 255))])
     # fitness = ImitationAesthetic("../target/drawisland.png")
     initial_population = population.generate_initial_population(width, height, [255, 255, 255])
     print("Generated new population of {} individuals".format(width * height))

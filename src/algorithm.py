@@ -41,7 +41,6 @@ class PSO(Algorithm):
         self.c1 = c1
         self.c2 = c2
 
-        # self.random_seed = 1
         self.random_seed = np.random.uniform(0, 1)
         self.inertia_min = inertia_min
         self.inertia_max = inertia_max
@@ -56,8 +55,13 @@ class PSO(Algorithm):
         inertia_change = (self.current_iteration / self.iterations) * (self.inertia_max - self.inertia_min)
         inertia = self.inertia_max - inertia_change + self.random_seed
 
-        # self.evaluate_particles(fitness)
         self.score = fitness.evaluate_texture(self.location)
+
+        for i, values in enumerate(zip(self.score, self.best_score, self.location, self.best_location), 0):
+            score, best_score, location, best_location = values
+            if score < best_score:
+                self.best_score[i] = score
+                self.best_location[i] = location
 
         random1 = self.c1 * np.random.uniform(0, 1, self.location.shape)
         random2 = self.c2 * np.random.uniform(0, 1, self.location.shape)
@@ -70,19 +74,6 @@ class PSO(Algorithm):
 
         self.next_location = self.location + self.velocity
         self.next_location = np.clip(self.next_location, 0, 255)
-
-        x, y = 0, 0
-        score = fitness.evaluate_texture(self.next_location)
-        for i, location in enumerate(self.next_location, 0):
-
-            if score[self.width * y + x] < self.best_score[self.width * y + x]:
-                self.best_score[self.width * y + x] = score[self.width * y + x]
-                self.best_location[i] = location
-
-            x += 1
-            if x >= self.width:
-                x = 0
-                y += 1
 
         temp = self.location
         self.location = self.next_location

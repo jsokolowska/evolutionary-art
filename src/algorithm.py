@@ -71,7 +71,6 @@ class PSO(Algorithm):
         self.c2 = c2
 
         self.random_seed = np.random.uniform(0, 1)
-        self.inertia = inertia_max
         self.inertia_min = inertia_min
         self.inertia_max = inertia_max
 
@@ -83,25 +82,26 @@ class PSO(Algorithm):
 
     def iteration(self, fitness):
         inertia_change = (self.current_iteration / self.iterations) * (self.inertia_max - self.inertia_min)
-        self.inertia = self.inertia_max - inertia_change + self.random_seed
+        inertia = self.inertia_max - inertia_change + self.random_seed
 
         self.evaluate_particles(fitness)
 
+        random1 = self.c1 * np.random.uniform(0, 1, self.location.shape)
+        random2 = self.c2 * np.random.uniform(0, 1, self.location.shape)
+
+        best_self_velocity = random1 * (self.best_location - self.location)
+        best_neighbour_velocity = random2 * (self.best_neighbours() - self.location)
+
+        self.velocity = inertia * self.velocity + best_self_velocity + best_neighbour_velocity
+        self.velocity = np.clip(self.velocity, -255, 255)
+
+        self.next_location = self.location + self.velocity
+        self.next_location = np.clip(self.next_location, 0, 255)
+
         x, y = 0, 0
-
-        for i, location in enumerate(self.location, 0):
-            best_self_velocity = self.c1 * np.random.uniform(0, 1) * np.array(self.best_location[i] - location)
-            best_neighbour_velocity = self.c2 * np.random.uniform(0, 1) * np.array(self.best_neighbour(x, y) - location)
-
-            self.velocity[i] += self.inertia * self.velocity[i] + best_self_velocity + best_neighbour_velocity
-            self.velocity[i] = np.clip(self.velocity[i], -255, 255)
-
-            self.next_location[i] = self.location[i] + tuple(self.velocity[i])
-
-            self.next_location[i] = np.clip(self.next_location[i], 0, 255)
-
-            if fitness(self.next_location[i], x, y) < fitness(self.best_location[i], x, y):
-                self.best_location[i] = self.next_location[i]
+        for i, location in enumerate(self.next_location, 0):
+            if fitness(location, x, y) < fitness(self.best_location[i], x, y):
+                self.best_location[i] = location
 
             x += 1
             if x >= self.width:
@@ -155,3 +155,17 @@ class PSO(Algorithm):
             best_index = index
 
         return self.location[best_index]
+
+    def best_neighbours(self):
+        x, y = 0, 0
+        best_neighbours = copy.deepcopy(self.location)
+
+        for i, location in enumerate(self.location, 0):
+            best_neighbours[i] = self.best_neighbour(x, y)
+
+            x += 1
+            if x >= self.width:
+                x = 0
+                y += 1
+
+        return best_neighbours

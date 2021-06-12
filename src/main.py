@@ -46,9 +46,9 @@ class AestheticFitness(fitness_functions.FitnessFunction):
 
 if __name__ == "__main__":
 
-    width, height = 50, 50
+    width, height = 150, 150
     iterations = 150
-    step = 30
+    step = 10
     generation = 0
     show_images = False
     p = 10

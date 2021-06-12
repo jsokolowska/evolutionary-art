@@ -68,7 +68,7 @@ class ImitationAesthetic(fitness_functions.FitnessFunction):
 
 if __name__ == "__main__":
 
-    width, height = 150, 150
+    width, height = 70, 70
     iterations = 150
     step = 10
     generation = 0
@@ -82,17 +82,17 @@ if __name__ == "__main__":
 
     aesthetic_fitness_list = [AestheticFitness(fitness1, p, "c1"),
                               AestheticFitness(fitness2, p, "c2"),
-                              AestheticFitness(fitness3, p, "c3")]
+                              AestheticFitness(fitness3, p, "c3"),
+                              ImitationAesthetic("../target/starry_night.jpg")]
 
-    selection = selections.BestFit()
-    mutation = mutations.GaussianMutation(0, 10)
+    weights = [1/6, 1/6, 1/6, 1]
+
     # fitness = SimpleFitness((255, 0, 255))
     fitness = fitness_functions.CompoundFitnessFunction(aesthetic_fitness_list, weights)
     # fitness = ImitationAesthetic("../target/drawisland.png")
     initial_population = population.generate_initial_population(width, height, [255, 255, 255, 0])
     print("Generated new population of {} individuals".format(width * height))
 
-    # alg = algorithm.BasicEvolution(initial_population, mutation, selection)
     alg = algorithm.PSO(initial_population, 2, 2, 0.4, 0.9, iterations, width, height)
 
     for i in trange(0, iterations, step):

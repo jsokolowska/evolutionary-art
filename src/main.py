@@ -2,73 +2,17 @@ import numpy as np
 
 import algorithm
 import population
-import mutations
-import selections
-import fitness_functions
+from fitness_functions import *
 from aesthetic_functions import *
 from tqdm import trange
-from PIL import Image
-from numpy import asarray
+
 
 import visualization
 
 
-class SimpleFitness(fitness_functions.FitnessFunction):
-    def __init__(self, color):
-        self.color = color
-
-    def __call__(self, color, x, y):
-        r_diff = abs(color[0] - self.color[0])
-        g_diff = abs(color[1] - self.color[1])
-        b_diff = abs(color[2] - self.color[2])
-
-        return r_diff + g_diff + b_diff
-
-
-class Temp(fitness_functions.FitnessFunction):
-    def __call__(self, color, x, y):
-        return 0
-
-
-class AestheticFitness(fitness_functions.FitnessFunction):
-    def __init__(self, aesthetic, p, channel="c1"):
-        self.aesthetic = aesthetic
-        self.p = p
-        self.channel = channel
-
-    def __call__(self, color, x, y):
-        if self.channel == "c1":
-            return abs(color[0] - self.aesthetic(x, y, self.p))
-        elif self.channel == "c2":
-            return abs(color[1] - self.aesthetic(x, y, self.p))
-        elif self.channel == "c3":
-            return abs(color[2] - self.aesthetic(x, y, self.p))
-        else:
-            raise RuntimeError("Invalid channel")
-
-
-class ImitationAesthetic(fitness_functions.FitnessFunction):
-    def __init__(self, artwork_path, channels=None):
-        if channels is None:
-            channels = ["c1", "c2", "c3"]
-        artwork = Image.open(artwork_path)
-        self.data = asarray(artwork)
-        self.channels = channels
-
-    def __call__(self, color, x, y):
-        score = 0
-        if "c1" in self.channels:
-            score += abs(color[0] - self.data[y][x][0])
-        if "c2" in self.channels:
-            score += abs(color[1] - self.data[y][x][1])
-        if "c3" in self.channels:
-            score += abs(color[2] - self.data[y][x][2])
-        return score
-
-
 if __name__ == "__main__":
 
-    width, height = 70, 70
+    width, height = 150, 150
     iterations = 150
     step = 10
     generation = 0
@@ -88,8 +32,8 @@ if __name__ == "__main__":
     weights = [1/6, 1/6, 1/6, 1]
 
     # fitness = SimpleFitness((255, 0, 255))
-    fitness = fitness_functions.CompoundFitnessFunction(aesthetic_fitness_list, weights)
-    # fitness = ImitationAesthetic("../target/drawisland.png")
+    # fitness = CompoundFitnessFunction(aesthetic_fitness_list, weights)
+    fitness = ImitationAesthetic("../target/drawisland.png")
     initial_population = population.generate_initial_population(width, height, [255, 255, 255, 0])
     print("Generated new population of {} individuals".format(width * height))
 

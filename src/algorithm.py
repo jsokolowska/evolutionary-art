@@ -34,12 +34,14 @@ class PSO(Algorithm):
         self.location = self.population
         self.best_location = copy.deepcopy(self.location)
         self.next_location = copy.deepcopy(self.location)
-        self.velocity = np.array([(np.random.uniform(-1, 1), np.random.uniform(-1, 1), np.random.uniform(-1, 1), 0) for i in population])
+        self.velocity = np.array([(np.random.uniform(-1, 1), np.random.uniform(-1, 1), np.random.uniform(-1, 1)) for i in population])
         self.score = np.zeros(len(population))
+        self.best_score = np.full(len(population), math.inf)
 
         self.c1 = c1
         self.c2 = c2
 
+        # self.random_seed = 1
         self.random_seed = np.random.uniform(0, 1)
         self.inertia_min = inertia_min
         self.inertia_max = inertia_max
@@ -54,7 +56,8 @@ class PSO(Algorithm):
         inertia_change = (self.current_iteration / self.iterations) * (self.inertia_max - self.inertia_min)
         inertia = self.inertia_max - inertia_change + self.random_seed
 
-        self.evaluate_particles(fitness)
+        # self.evaluate_particles(fitness)
+        self.score = fitness.evaluate_texture(self.location)
 
         random1 = self.c1 * np.random.uniform(0, 1, self.location.shape)
         random2 = self.c2 * np.random.uniform(0, 1, self.location.shape)
@@ -69,8 +72,11 @@ class PSO(Algorithm):
         self.next_location = np.clip(self.next_location, 0, 255)
 
         x, y = 0, 0
+        score = fitness.evaluate_texture(self.next_location)
         for i, location in enumerate(self.next_location, 0):
-            if fitness(location, x, y) < fitness(self.best_location[i], x, y):
+
+            if score[self.width * y + x] < self.best_score[self.width * y + x]:
+                self.best_score[self.width * y + x] = score[self.width * y + x]
                 self.best_location[i] = location
 
             x += 1

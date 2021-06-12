@@ -1,5 +1,5 @@
+import numpy as np
 from PIL import Image
-from numpy import asarray
 
 
 class FitnessFunction:
@@ -26,6 +26,28 @@ class CompoundFitnessFunction(FitnessFunction):
         return score
 
 
+class ImageFitnessFunction(FitnessFunction):
+    def __init__(self, width, height, c1, c2, c3, p, imitation=None, weights=None):
+        self.texture = np.zeros((width * height, 3))
+        for x in range(width):
+            for y in range(height):
+                self.texture[y * width + x] = [c1(x, y, p), c2(x, y, p), c3(x, y, p)]
+
+        self.width = width
+        self.imitation = imitation
+        self.weights = weights if weights is not None else [1, 1, 1, 1]
+
+    def evaluate_texture(self, texture):
+        aesthetic_score = np.sum(self.weights[:3] * np.abs(texture - self.texture), 1)
+        imitation_score = self.weights[-1] * np.sum(np.abs(texture - self.imitation), 1) if self.imitation is not None else np.zeros(aesthetic_score.shape)
+        return aesthetic_score + imitation_score
+
+    def __call__(self, color, x, y):
+        aesthetic_score = np.sum(self.weights * np.abs(self.texture[y * self.width + x] - color))
+        imitation_score = self.weights[-1] * np.sum(np.abs(self.imitation[y * self.width + x] - color)) if self.imitation is not None else 0
+        return aesthetic_score + imitation_score
+
+
 class SimpleFitness(FitnessFunction):
     def __init__(self, color):
         self.color = color
@@ -39,7 +61,7 @@ class SimpleFitness(FitnessFunction):
 
 
 class AestheticFitness(FitnessFunction):
-    def __init__(self, aesthetic, p, channel="c1"):
+    def __init__(self, aesthetic, width, height, p, channel="c1"):
         self.aesthetic = aesthetic
         self.p = p
         self.channel = channel
@@ -60,7 +82,7 @@ class ImitationAesthetic(FitnessFunction):
         if channels is None:
             channels = ["c1", "c2", "c3"]
         artwork = Image.open(artwork_path)
-        self.data = asarray(artwork)
+        self.data = np.asarray(artwork)
         self.channels = channels
 
     def __call__(self, color, x, y):

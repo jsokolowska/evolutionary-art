@@ -37,8 +37,7 @@ class ImageFitnessFunction(FitnessFunction):
         self.texture = np.zeros((width * height, 3))
         for x in range(width):
             for y in range(height):
-                self.texture[y * width + x] = [c1(x, y, p), c2(x, y, p), c3(x, y, p)]
-
+                self.texture[width * y + x] = [c1(x, y, p), c2(x, y, p), c3(x, y, p)]
         self.width = width
         self.height = height
         self.imitation_texture = imitation.texture
@@ -93,6 +92,7 @@ class ImitationAesthetic(FitnessFunction):
         if width == 0 or height == 0:
             raise ValueError("Height and width must be provided")
         artwork = Image.open(artwork_path)
+        artwork = artwork.convert("HSV")
         if width > 0 and height > 0 and resize:
             artwork = artwork.resize((width, height))
         elif width > 0 and height > 0:
@@ -100,24 +100,9 @@ class ImitationAesthetic(FitnessFunction):
         self.data = np.asarray(artwork)
         self.data = gaussian_filter(self.data, 1)
         self.texture = np.zeros((width * height, 3))
-
-        print("Calculating imitation image")
-        # radius = math.floor((width + height) / 2 * 0.01)
-        for x in trange(width):
+        for x in range(width):
             for y in range(height):
                 self.texture[y * width + x] = self.data[y][x]
-        # radius = 1
-        # for x in trange(width):
-        #     for y in range(height):
-        #         imitation_target = 0
-        #         x_range = min(x + radius + 1, width) - max(x - radius, 0)
-        #         y_range = min(y + radius + 1, width) - max(y - radius, 0)
-        #         for j in range(max([x - radius, 0]), min([x + radius + 1, width])):
-        #             for i in range(max([y - radius, 0]), min([y + radius + 1, width])):
-        #                 imitation_factor = (x - j) ** 2 + (y - i) ** 2 + 1
-        #                 imitation_target += self.data[y][x] / imitation_factor
-        #         self.texture[y * width + x] = imitation_target / (x_range * y_range * 0.1)
-        #         self.a = "a"
 
     def __call__(self, color, x, y):
         score = 0

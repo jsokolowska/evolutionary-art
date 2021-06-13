@@ -14,9 +14,6 @@ if __name__ == '__main__':
     parser.add_argument('height', type=int, help='result image height')
     parser.add_argument('--input', type=str, help='image to evolve from')
 
-    parser.add_argument('--functions', '-f', type=int, metavar='F_NUM', choices=range(6),
-                        help='aesthetic functions per image chanel')
-
     parser.add_argument('--weights', '-w', nargs=4, default=[1, 1, 1, 1.3],
                         help='target weights for each chanel and target artwork, by default=[1,1,1,1.3]')
 
@@ -27,7 +24,8 @@ if __name__ == '__main__':
                        help='clip or resize')
 
     group2 = parser.add_argument_group('Inner algorithm parameters')
-    group2.add_argument('-p', type=int, default=10, help='optional parameter p to be used for aesthetic fitness functions')
+    group2.add_argument('-p', type=int, default=10, help='optional parameter p to be used for aesthetic fitness '
+                                                         'functions')
     group2.add_argument('--max_velocity', type=int, default=10, help='max particle velocity for PSO algorithm')
     group2.add_argument('-c1', type=float, default=2, help='')
     group2.add_argument('-c2', type=float, default=2, help='')

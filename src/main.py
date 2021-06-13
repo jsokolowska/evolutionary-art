@@ -90,7 +90,7 @@ def init_and_run(args):
     fitness_target = visualization.image_from_population(width, height, fitness.texture)
     fitness_target.save("../results/fitness_target.png")
 
-    if imitating_fitness is not None :
+    if imitating_fitness is not None:
         fitness_imitation = visualization.image_from_population(width, height, imitating_fitness.texture)
         fitness_imitation.save("../results/imitation.png")
 

@@ -41,7 +41,10 @@ class ImageFitnessFunction(FitnessFunction):
         # self.texture = gaussian_filter(self.texture.reshape((width, height, 3)), 2).reshape(-1, 3)
         self.width = width
         self.height = height
-        self.imitation_texture = imitation.texture
+        if imitation is None:
+            self.imitation_texture = None
+        else:
+            self.imitation_texture = imitation.texture
         self.weights = weights if weights is not None else [1, 1, 1, 1.5]
 
     def evaluate_texture(self, texture):

@@ -17,12 +17,12 @@ def generate_initial_population(width: int, height: int, color: List[int] = None
     return np.array(population)
 
 
-def from_image(path: str, width: int, height: int, resize = False):
+def from_image(path: str, width: int, height: int, clip=False):
     if width == 0 or height == 0:
         raise ValueError("Height and width must be provided")
     artwork = Image.open(path)
     artwork = artwork.convert("HSV")
-    if width > 0 and height > 0 and resize:
+    if width > 0 and height > 0 and not clip:
         artwork = artwork.resize((width, height))
     elif width > 0 and height > 0:
         artwork = artwork.crop(box=(0, 0, width, height))

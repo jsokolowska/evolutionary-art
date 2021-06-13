@@ -1,6 +1,6 @@
 import numpy as np
 from PIL import Image
-from typing import List
+
 
 def population_to_texture(width: int, height: int, population):
     texture = np.zeros((width, height, 3), np.int8)

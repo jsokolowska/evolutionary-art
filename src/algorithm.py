@@ -28,13 +28,16 @@ class PSO(Algorithm):
         Instead of global neighbourhood Neumann topography is used
     """
 
-    def __init__(self, population: List[List[int]], c1: float, c2: float, max_velocity, inertia_min: float, inertia_max: float, iterations: int, width: int, height: int):
+    def __init__(self, population: List[List[int]], c1: float, c2: float, max_velocity, inertia_min: float,
+                 inertia_max: float, iterations: int, width: int, height: int, radius: int):
         self.initial_population = copy.deepcopy(population)
 
         self.location = np.array(population)
         self.best_location = copy.deepcopy(self.location)
         self.next_location = copy.deepcopy(self.location)
-        self.velocity = np.array([(np.random.uniform(-max_velocity, max_velocity), np.random.uniform(-max_velocity, max_velocity), np.random.uniform(-max_velocity, max_velocity)) for i in population])
+        self.velocity = np.array([(np.random.uniform(-max_velocity, max_velocity),
+                                   np.random.uniform(-max_velocity, max_velocity),
+                                   np.random.uniform(-max_velocity, max_velocity)) for i in population])
         self.score = np.zeros(len(population))
         self.best_score = np.full(len(population), math.inf)
 
@@ -51,6 +54,8 @@ class PSO(Algorithm):
 
         self.width = width
         self.height = height
+
+        self.radius = radius
 
     def iteration(self, fitness):
         inertia_change = (self.current_iteration / self.iterations) * (self.inertia_max - self.inertia_min)
@@ -86,7 +91,6 @@ class PSO(Algorithm):
         while iterations > 0:
             self.iteration(fitness)
             iterations -= 1
-
         self.population = self.location
 
     def evaluate_particles(self, fitness):
@@ -102,26 +106,17 @@ class PSO(Algorithm):
     def best_neighbour(self, x, y):
         best_index = -1
         best_score = math.inf
-
-        index = self.width * y + x - 1
-        if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
-            best_score = self.best_score[index]
-            best_index = index
-
-        index = self.width * y + x + 1
-        if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
-            best_score = self.best_score[index]
-            best_index = index
-
-        index = self.width * (y - 1) + x
-        if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
-            best_score = self.best_score[index]
-            best_index = index
-
-        index = self.width * (y + 1) + x
-        if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
-            best_index = index
-
+        for distance in range(1, self.radius + 1):
+            for i in range(-distance, distance + 1):
+                j = self.radius - abs(i)
+                idx = self.width * (y + i) + x + j
+                if 0 <= idx < self.width * self.height and self.best_score[idx] < best_score:
+                    best_score = self.best_score[idx]
+                    best_index = idx
+                idx = self.width * (y + i) + x - j
+                if 0 <= idx < self.width * self.height and self.best_score[idx] < best_score:
+                    best_score = self.best_score[idx]
+                    best_index = idx
         return self.best_location[best_index]
 
     def best_neighbours(self):

@@ -1,6 +1,9 @@
 import math
 import numpy as np
 
+def discrete_a1(x, y, p):
+    return ((x | y) / p) % 255
+
 
 def aesthetic1(x: int, y: int, p: int):
     return (x | y) % 255

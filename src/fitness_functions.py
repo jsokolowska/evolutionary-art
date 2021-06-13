@@ -38,6 +38,7 @@ class ImageFitnessFunction(FitnessFunction):
         for x in range(width):
             for y in range(height):
                 self.texture[width * y + x] = [c1(x, y, p), c2(x, y, p), c3(x, y, p)]
+        # self.texture = gaussian_filter(self.texture.reshape((width, height, 3)), 2).reshape(-1, 3)
         self.width = width
         self.height = height
         self.imitation_texture = imitation.texture
@@ -98,7 +99,6 @@ class ImitationAesthetic(FitnessFunction):
         elif width > 0 and height > 0:
             artwork = artwork.crop(box=(0, 0, width, height))
         self.data = np.asarray(artwork)
-        self.data = gaussian_filter(self.data, 1)
         self.texture = np.zeros((width * height, 3))
         for x in range(width):
             for y in range(height):

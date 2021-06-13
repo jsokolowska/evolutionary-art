@@ -37,9 +37,7 @@ if __name__ == "__main__":
     fitness_imitation.save("../results/imitation.png")
 
     # initial_population = population.generate_initial_population(width, height, [0, 0, 255])
-    # initial_population = imitating_fitness.texture
-    starting_image = Image.open("../target/starting1.jpg").convert("HSV").resize((width, height))
-    initial_population = np.asarray(starting_image).reshape((width * height, 3))
+    initial_population = population.from_image("../target/colors.png", width=width, height=height, resize=True)
     print("Generated new population of {} individuals".format(width * height))
 
     alg = algorithm.PSO(initial_population, 2, 2, 10, 0.4, 0.9, iterations, width, height)

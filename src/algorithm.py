@@ -28,21 +28,21 @@ class PSO(Algorithm):
         Instead of global neighbourhood Neumann topography is used
     """
 
-    def __init__(self, population: List[List[int]], c1: float, c2: float, r, inertia_min: float, inertia_max: float, iterations: int, width: int, height: int):
-        self.population = np.array(population)
+    def __init__(self, population: List[List[int]], c1: float, c2: float, max_velocity, inertia_min: float, inertia_max: float, iterations: int, width: int, height: int):
+        self.initial_population = copy.deepcopy(population)
 
-        self.location = self.population
+        self.location = np.array(population)
         self.best_location = copy.deepcopy(self.location)
         self.next_location = copy.deepcopy(self.location)
-        self.velocity = np.array([(np.random.uniform(-255, 255), np.random.uniform(-255, 255), np.random.uniform(-255, 255)) for i in population])
+        self.velocity = np.array([(np.random.uniform(-max_velocity, max_velocity), np.random.uniform(-max_velocity, max_velocity), np.random.uniform(-max_velocity, max_velocity)) for i in population])
         self.score = np.zeros(len(population))
         self.best_score = np.full(len(population), math.inf)
 
         self.c1 = c1
         self.c2 = c2
-        self.range = r
+        self.max_velocity = max_velocity
 
-        self.random_seed = np.random.uniform(0, 1)
+        self.random_seed = 0
         self.inertia_min = inertia_min
         self.inertia_max = inertia_max
 
@@ -68,10 +68,10 @@ class PSO(Algorithm):
         random2 = self.c2 * np.random.uniform(0, 1, self.location.shape)
 
         best_self_velocity = random1 * (self.best_location - self.location)
-        best_neighbour_velocity = random2 * (self.best_neighbours(self.range) - self.location)
+        best_neighbour_velocity = random2 * (self.best_neighbours() - self.location)
 
         self.velocity = inertia * self.velocity + best_self_velocity + best_neighbour_velocity
-        self.velocity = np.clip(self.velocity, -255, 255)
+        self.velocity = np.clip(self.velocity, -self.max_velocity, self.max_velocity)
 
         self.next_location = self.location + self.velocity
         self.next_location = np.clip(self.next_location, 0, 255)
@@ -99,20 +99,9 @@ class PSO(Algorithm):
                 x = 0
                 y += 1
 
-    def best_neighbour(self, x, y, r):
+    def best_neighbour(self, x, y):
         best_index = -1
         best_score = math.inf
-
-        # for i in range(-r, r):
-        #     for j in range(-r, r):
-        #         if i == 0 and j == 0:
-        #             continue
-        #
-        #         if 0 <= x + i < self.width and 0 <= y + j < self.height:
-        #             index = self.width * (y + j) + x + i
-        #             if self.best_score[index] < best_score:
-        #                 best_score = self.best_score[index]
-        #                 best_index = index
 
         index = self.width * y + x - 1
         if 0 <= index < self.width * self.height and self.best_score[index] < best_score:
@@ -135,12 +124,12 @@ class PSO(Algorithm):
 
         return self.best_location[best_index]
 
-    def best_neighbours(self, r):
+    def best_neighbours(self):
         x, y = 0, 0
         best_neighbours = copy.deepcopy(self.location)
 
         for i, location in enumerate(self.location, 0):
-            best_neighbours[i] = self.best_neighbour(x, y, r)
+            best_neighbours[i] = self.best_neighbour(x, y)
 
             x += 1
             if x >= self.width:

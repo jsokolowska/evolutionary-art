@@ -29,7 +29,7 @@ class CompoundFitnessFunction(FitnessFunction):
         for function, weight in zip(self.functions, self.weights):
             score += weight * function(color, x, y)
 
-        return score
+        return score / len(self.functions)
 
 
 class ImageFitnessFunction(FitnessFunction):

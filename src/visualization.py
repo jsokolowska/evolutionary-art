@@ -1,6 +1,6 @@
 import numpy as np
 from PIL import Image
-from typing import List
+
 
 def population_to_texture(width: int, height: int, population):
     texture = np.zeros((width, height, 3), np.int8)
@@ -28,6 +28,7 @@ def image_from_texture(texture, color_mode="RGB"):
 
 def image_from_population(width: int, height: int, population, color_mode="RGB"):
     texture = population_to_texture(width, height, population)
-    img = Image.fromarray(texture, color_mode)
 
-    return img
+    img = Image.fromarray(texture, "HSV")
+
+    return img.convert(color_mode)

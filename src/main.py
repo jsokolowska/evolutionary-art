@@ -33,7 +33,7 @@ def init_and_run(arguments):
     if arguments.target is not None:
         imitating_fitness = ImitationAesthetic(arguments.target, width=width, height=height,
                                                clip=args.clip_target)
-    fitness = ImageFitnessFunction(width, height, aesthetic12, aesthetic9, aesthetic10, p, imitation=imitating_fitness,
+    fitness = ImageFitnessFunction(width, height, fitness1, fitness2, fitness3, p, imitation=imitating_fitness,
                                    weights=weights)
     fitness_target = visualization.image_from_population(width, height, fitness.texture)
     fitness_target.save("../results/fitness_target.png")
@@ -67,21 +67,21 @@ if __name__ == "__main__":
     args = Namespace()
     args.width = 400
     args.height = 400
-    args.iterations = 150
-    args.step = 30
+    args.iterations = 100
+    args.step = 20
     args.show = False
     args.functions = 1
-    args.weights = [1, 1, 1, 1.3]
-    args.target = None
+    args.weights = [1, 1, 1, 0]
+    args.target = "../target/boat.jpg"
     args.imitation_mode = 'resize'
     args.p = 10
-    args.c1 = 2
+    args.c1 = 1.3
     args.c2 = 2
-    args.max_velocity = 10
+    args.max_velocity = 8
     args.inertia_min = 0.4
     args.inertia_max = 0.9
-    args.input = '../target/colors.png'
-    args.radius = 4
+    args.input = "../init/stripes.png"
+    args.radius = 2
     args.clip_target = False
     args.clip_input = False
 

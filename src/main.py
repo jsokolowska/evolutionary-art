@@ -71,8 +71,8 @@ if __name__ == "__main__":
     args.step = 20
     args.show = False
     args.functions = 1
-    args.weights = [1, 1, 1, 0]
-    args.target = "../target/boat.jpg"
+    args.weights = [1, 1, 1, 1.1]
+    args.target = "../target/starry_night.jpg"
     args.imitation_mode = 'resize'
     args.p = 10
     args.c1 = 1.3
@@ -80,8 +80,8 @@ if __name__ == "__main__":
     args.max_velocity = 8
     args.inertia_min = 0.4
     args.inertia_max = 0.9
-    args.input = "../init/stripes.png"
-    args.radius = 2
+    args.input = None
+    args.radius = 1
     args.clip_target = False
     args.clip_input = False
 
